@@ -1,0 +1,21 @@
+{
+  "name": "MobileQuestVR.RoomCustomization",
+  "rootNamespace": "MobileQuestVR.RoomCustomization",
+  "references": [
+    "UnityEngine.UI",
+    "MobileQuestVR.Localization",
+    "MobileQuestVR.Settings",
+    "MobileQuestVR.Audio",
+    "MobileQuestVR.Notifications",
+    "MobileQuestVR.Environment"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

@@ -1,0 +1,23 @@
+{
+  "name": "MobileQuestVR.Media",
+  "rootNamespace": "MobileQuestVR.Media",
+  "references": [
+    "UnityEngine.UI",
+    "MobileQuestVR.Localization",
+    "MobileQuestVR.Settings",
+    "MobileQuestVR.VRRendering",
+    "MobileQuestVR.Environment",
+    "MobileQuestVR.Windows",
+    "MobileQuestVR.Notifications",
+    "MobileQuestVR.AndroidBridge"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

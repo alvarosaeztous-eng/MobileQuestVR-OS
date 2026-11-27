@@ -1,0 +1,22 @@
+{
+  "name": "MobileQuestVR.Windows",
+  "rootNamespace": "MobileQuestVR.Windows",
+  "references": [
+    "UnityEngine.UI",
+    "MobileQuestVR.Localization",
+    "MobileQuestVR.Settings",
+    "MobileQuestVR.VRRendering",
+    "MobileQuestVR.HeadTracking",
+    "MobileQuestVR.HandTracking",
+    "MobileQuestVR.Audio"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
