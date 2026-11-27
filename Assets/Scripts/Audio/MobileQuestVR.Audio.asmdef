@@ -1,0 +1,20 @@
+{
+  "name": "MobileQuestVR.Audio",
+  "rootNamespace": "MobileQuestVR.Audio",
+  "references": [
+    "UnityEngine.UI",
+    "MobileQuestVR.Localization",
+    "MobileQuestVR.AndroidBridge",
+    "MobileQuestVR.Settings",
+    "MobileQuestVR.Notifications"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

@@ -1,0 +1,178 @@
+name: Build MobileQuestVR Android APK (Unity 6 + GameCI)
+
+on:
+  workflow_dispatch:
+    inputs:
+      android_version_code:
+        description: 'Código de versión Android (versionCode entero)'
+        required: false
+        default: '1'
+      run_editmode_tests:
+        description: 'Ejecutar tests EditMode antes de compilar el APK'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate-unity-project:
+    name: 1. Auditoría Estática de Proyecto y Seguridad
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Static Verification Dependencies
+        run: pip install tree-sitter tree-sitter-c-sharp pyyaml
+
+      - name: Run Unity 6 Architecture, GUID, C# AST & Zero-Secrets Validator
+        run: python3 Tools/validate_unity_project.py
+
+  build-android-apk:
+    name: 2. Compilar APK Android Nativo (Unity 6000.0.36f1)
+    needs: validate-unity-project
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Free Runner Disk Space for Unity 6 + Android NDK/SDK Image
+        uses: jlumbroso/free-disk-space@v1.3.1
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Validate Unity License Secrets
+        env:
+          HAS_ULF: ${{ secrets.UNITY_LICENSE != '' }}
+          HAS_CREDS: ${{ secrets.UNITY_EMAIL != '' && secrets.UNITY_PASSWORD != '' }}
+        run: |
+          if [ "$HAS_ULF" != "true" ] && [ "$HAS_CREDS" != "true" ]; then
+            echo "::error::Faltan los secretos de licencia de Unity (UNITY_LICENSE o UNITY_EMAIL + UNITY_PASSWORD)."
+            echo "Configura UNITY_LICENSE, UNITY_EMAIL y UNITY_PASSWORD en GitHub Settings -> Secrets and variables -> Actions."
+            echo "Consulta docs/BUILD_AND_APK_GUIDE.md para los pasos exactos con GameCI."
+            exit 1
+          fi
+          echo "Credenciales de licencia Unity detectadas en GitHub Secrets."
+
+      - name: Restore Unity Library Cache
+        uses: actions/cache/restore@v4
+        with:
+          path: Library
+          key: Library-v1-MobileQuestVR-Android-6000.0.36f1-${{ hashFiles('Packages/manifest.json', 'ProjectSettings/ProjectSettings.asset') }}
+          restore-keys: |
+            Library-v1-MobileQuestVR-Android-6000.0.36f1-
+
+      - name: Run Optional EditMode Unit Tests (GameCI)
+        if: ${{ inputs.run_editmode_tests == true }}
+        uses: game-ci/unity-test-runner@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        with:
+          unityVersion: 6000.0.36f1
+          testMode: EditMode
+          checkName: MobileQuestVR EditMode Tests
+
+      - name: Prepare Optional Secure Release Keystore
+        id: keystore
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/mobilequestvr-release.keystore"
+            chmod 600 "$RUNNER_TEMP/mobilequestvr-release.keystore"
+            echo "keystore_ready=true" >> "$GITHUB_OUTPUT"
+            echo "Keystore de firma decodificado de forma segura en directorio temporal."
+          else
+            echo "keystore_ready=false" >> "$GITHUB_OUTPUT"
+            echo "ANDROID_KEYSTORE_BASE64 no definido: se compilará un APK firmado con clave debug estándar instalable."
+          fi
+
+      - name: Compile Native Android APK with GameCI Unity Builder
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+          ANDROID_VERSION_CODE: ${{ inputs.android_version_code || '1' }}
+        with:
+          targetPlatform: Android
+          unityVersion: 6000.0.36f1
+          androidExportType: androidPackage
+          buildsPath: Builds
+          buildName: MobileQuestVR
+          buildMethod: MobileQuestVR.Editor.BuildScript.BuildAndroidApk
+          androidKeystoreName: ${{ steps.keystore.outputs.keystore_ready == 'true' && 'release.keystore' || '' }}
+          androidKeystoreBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          androidKeystorePass: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+          androidKeyaliasName: ${{ secrets.ANDROID_KEYALIAS_NAME }}
+          androidKeyaliasPass: ${{ secrets.ANDROID_KEYALIAS_PASS }}
+
+      - name: Save Unity Library Cache
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: Library
+          key: Library-v1-MobileQuestVR-Android-6000.0.36f1-${{ hashFiles('Packages/manifest.json', 'ProjectSettings/ProjectSettings.asset') }}-${{ github.run_id }}
+
+      - name: Verify Generated Android APK Integrity & Architecture
+        run: |
+          echo "=== Buscando artefacto APK generado ==="
+          APK_PATH="Builds/Android/MobileQuestVR.apk"
+          if [ ! -f "$APK_PATH" ]; then
+            FOUND=$(find Builds -type f -name "*.apk" | head -n 1 || true)
+            if [ -n "$FOUND" ] && [ "$FOUND" != "$APK_PATH" ]; then
+              mkdir -p Builds/Android
+              cp "$FOUND" "$APK_PATH"
+            fi
+          fi
+
+          if [ ! -f "$APK_PATH" ]; then
+            echo "::error::El archivo APK no existe en Builds/Android/MobileQuestVR.apk"
+            exit 1
+          fi
+
+          SIZE_BYTES=$(stat -c%s "$APK_PATH")
+          echo "APK encontrado: $APK_PATH ($SIZE_BYTES bytes)"
+          if [ "$SIZE_BYTES" -lt 5000000 ]; then
+            echo "::error::El APK generado es anormalmente pequeño ($SIZE_BYTES bytes)."
+            exit 1
+          fi
+
+          echo "=== Comprobando contenido nativo Android (AndroidManifest + IL2CPP ARM64) ==="
+          unzip -l "$APK_PATH" | grep -E "AndroidManifest.xml|lib/arm64-v8a/libil2cpp.so|lib/arm64-v8a/libunity.so"
+          sha256sum "$APK_PATH" > "${APK_PATH}.sha256"
+          cat "${APK_PATH}.sha256"
+
+      - name: Publish Installable Android APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MobileQuestVR-Android-APK-v1.0.0-${{ github.run_number }}
+          path: |
+            Builds/Android/MobileQuestVR.apk
+            Builds/Android/MobileQuestVR.apk.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Shred Temporary Keystore
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/mobilequestvr-release.keystore" ]; then
+            rm -f "$RUNNER_TEMP/mobilequestvr-release.keystore"
+          fi

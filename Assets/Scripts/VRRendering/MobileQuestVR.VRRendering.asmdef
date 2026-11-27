@@ -1,0 +1,19 @@
+{
+  "name": "MobileQuestVR.VRRendering",
+  "rootNamespace": "MobileQuestVR.VRRendering",
+  "references": [
+    "UnityEngine.UI",
+    "MobileQuestVR.Localization",
+    "MobileQuestVR.AndroidBridge",
+    "MobileQuestVR.Settings"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

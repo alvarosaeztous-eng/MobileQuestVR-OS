@@ -1,0 +1,23 @@
+{
+  "name": "MobileQuestVR.Gallery",
+  "rootNamespace": "MobileQuestVR.Gallery",
+  "references": [
+    "UnityEngine.UI",
+    "MobileQuestVR.Localization",
+    "MobileQuestVR.Settings",
+    "MobileQuestVR.Media",
+    "MobileQuestVR.RoomCustomization",
+    "MobileQuestVR.Windows",
+    "MobileQuestVR.Notifications",
+    "MobileQuestVR.AndroidBridge"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

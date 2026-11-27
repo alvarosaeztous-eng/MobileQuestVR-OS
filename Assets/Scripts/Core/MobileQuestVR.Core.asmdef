@@ -1,0 +1,31 @@
+{
+  "name": "MobileQuestVR.Core",
+  "rootNamespace": "MobileQuestVR.Core",
+  "references": [
+    "UnityEngine.UI",
+    "MobileQuestVR.Localization",
+    "MobileQuestVR.AndroidBridge",
+    "MobileQuestVR.Settings",
+    "MobileQuestVR.Notifications",
+    "MobileQuestVR.Performance",
+    "MobileQuestVR.Audio",
+    "MobileQuestVR.VRRendering",
+    "MobileQuestVR.HeadTracking",
+    "MobileQuestVR.HandTracking",
+    "MobileQuestVR.Environment",
+    "MobileQuestVR.RoomCustomization",
+    "MobileQuestVR.Windows",
+    "MobileQuestVR.Media",
+    "MobileQuestVR.Gallery",
+    "MobileQuestVR.Browser"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

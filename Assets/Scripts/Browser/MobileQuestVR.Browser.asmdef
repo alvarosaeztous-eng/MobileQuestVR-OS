@@ -1,0 +1,22 @@
+{
+  "name": "MobileQuestVR.Browser",
+  "rootNamespace": "MobileQuestVR.Browser",
+  "references": [
+    "UnityEngine.UI",
+    "MobileQuestVR.Localization",
+    "MobileQuestVR.Settings",
+    "MobileQuestVR.Windows",
+    "MobileQuestVR.Audio",
+    "MobileQuestVR.Notifications",
+    "MobileQuestVR.AndroidBridge"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

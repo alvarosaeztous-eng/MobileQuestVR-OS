@@ -1,0 +1,26 @@
+{
+  "name": "MobileQuestVR.Tests.EditMode",
+  "rootNamespace": "MobileQuestVR.Tests.EditMode",
+  "references": [
+    "UnityEngine.TestRunner",
+    "UnityEditor.TestRunner",
+    "MobileQuestVR.Localization",
+    "MobileQuestVR.Settings",
+    "MobileQuestVR.Environment"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": true,
+  "precompiledReferences": [
+    "nunit.framework.dll"
+  ],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
